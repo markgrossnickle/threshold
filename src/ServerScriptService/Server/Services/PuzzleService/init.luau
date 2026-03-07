@@ -279,7 +279,8 @@ local function createPatternMatchPuzzle(roomData: RoomData): PuzzleState
 			tile.Anchored = true
 			tile.Name = "Tile_" .. (row * gridSize + col + 1)
 			tile.Size = Vector3.new(tileSize - 0.2, 0.3, tileSize - 0.2)
-			tile.Position = roomData.Origin + Vector3.new(startX + col * tileSize + tileSize / 2, 0.15, startZ + row * tileSize + tileSize / 2)
+			tile.Position = roomData.Origin
+				+ Vector3.new(startX + col * tileSize + tileSize / 2, 0.15, startZ + row * tileSize + tileSize / 2)
 			tile.Color = Color3.fromRGB(60, 60, 65)
 			tile.Material = Enum.Material.SmoothPlastic
 			tile.Parent = room
@@ -334,11 +335,8 @@ local function createGeneratorPuzzle(roomData: RoomData): PuzzleState
 		error("No room to create puzzle in")
 	end
 
-	local canisterCount = math.clamp(
-		rng:NextInteger(ThresholdConfig.BaseFuelCanisters, ThresholdConfig.MaxFuelCanisters),
-		2,
-		3
-	)
+	local canisterCount =
+		math.clamp(rng:NextInteger(ThresholdConfig.BaseFuelCanisters, ThresholdConfig.MaxFuelCanisters), 2, 3)
 
 	local props: { Instance } = {}
 	local solution = {}
@@ -442,14 +440,11 @@ function PuzzleService.Client:SubmitInput(player: Player, inputValue: number): (
 
 	self.Server.Client.PuzzleStateUpdate:FireAll(activePuzzle.CurrentInput)
 
-	if activePuzzle.PuzzleType == "LeverSequence" or activePuzzle.PuzzleType == "WireConnect" then
-		if activePuzzle.Solution[step] ~= inputValue then
-			-- Wrong order, reset
-			activePuzzle.CurrentInput = {}
-			self.Server.Client.PuzzleFailed:FireAll()
-			return
-		end
-	elseif activePuzzle.PuzzleType == "PatternMatch" then
+	if
+		activePuzzle.PuzzleType == "LeverSequence"
+		or activePuzzle.PuzzleType == "WireConnect"
+		or activePuzzle.PuzzleType == "PatternMatch"
+	then
 		if activePuzzle.Solution[step] ~= inputValue then
 			activePuzzle.CurrentInput = {}
 			self.Server.Client.PuzzleFailed:FireAll()

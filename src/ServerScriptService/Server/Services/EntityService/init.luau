@@ -139,7 +139,6 @@ local function createEntityModel(entityType: string, position: Vector3, folder: 
 		end
 
 		model.PrimaryPart = body
-
 	elseif entityType == "Crawler" then
 		-- Spider-like, low to ground
 		local body = Instance.new("Part")
@@ -159,14 +158,14 @@ local function createEntityModel(entityType: string, position: Vector3, folder: 
 			leg.Size = Vector3.new(0.2, 0.2, 3)
 			local side = if i <= 3 then -1 else 1
 			local zOff = ((i - 1) % 3 - 1) * 1.2
-			leg.CFrame = CFrame.new(position + Vector3.new(side * 2, 0.3, zOff)) * CFrame.Angles(0, 0, math.rad(side * 30))
+			leg.CFrame = CFrame.new(position + Vector3.new(side * 2, 0.3, zOff))
+				* CFrame.Angles(0, 0, math.rad(side * 30))
 			leg.Color = Color3.fromRGB(200, 190, 180)
 			leg.Material = Enum.Material.SmoothPlastic
 			leg.Parent = model
 		end
 
 		model.PrimaryPart = body
-
 	elseif entityType == "Mimic" then
 		-- Looks like a cabinet but slightly off
 		local body = Instance.new("Part")
@@ -178,7 +177,6 @@ local function createEntityModel(entityType: string, position: Vector3, folder: 
 		body.Material = Enum.Material.Wood
 		body.Parent = model
 		model.PrimaryPart = body
-
 	elseif entityType == "Whisper" then
 		-- Invisible entity, just a small anchor part
 		local anchor = Instance.new("Part")
@@ -190,7 +188,6 @@ local function createEntityModel(entityType: string, position: Vector3, folder: 
 		anchor.CanCollide = false
 		anchor.Parent = model
 		model.PrimaryPart = anchor
-
 	elseif entityType == "Watcher" then
 		-- Giant eye
 		local eye = Instance.new("Part")
@@ -216,7 +213,6 @@ local function createEntityModel(entityType: string, position: Vector3, folder: 
 		iris.Parent = model
 
 		model.PrimaryPart = eye
-
 	elseif entityType == "Glitch" then
 		-- Corrupted humanoid
 		local body = Instance.new("Part")
@@ -239,7 +235,6 @@ local function createEntityModel(entityType: string, position: Vector3, folder: 
 		head.Parent = model
 
 		model.PrimaryPart = body
-
 	elseif entityType == "Devourer" then
 		-- Floor mouth parts
 		local mouth = Instance.new("Part")
@@ -308,7 +303,12 @@ function EntityService:SpawnEntity(entityType: string, roomData: RoomData): ()
 	end)
 end
 
-function EntityService:_runBehavior(entityType: string, model: Model, roomData: RoomData, trove: typeof(Trove.new())): ()
+function EntityService:_runBehavior(
+	entityType: string,
+	model: Model,
+	roomData: RoomData,
+	trove: typeof(Trove.new())
+): ()
 	local lingerTime = rng:NextNumber() * (ThresholdConfig.EntityLingerTime.max - ThresholdConfig.EntityLingerTime.min)
 		+ ThresholdConfig.EntityLingerTime.min
 	local startTime = tick()
@@ -339,7 +339,6 @@ function EntityService:_runBehavior(entityType: string, model: Model, roomData: 
 			end
 			task.wait(1 / 30)
 		end
-
 	elseif entityType == "Crawler" then
 		-- Drops near players. Crouch to avoid.
 		while tick() - startTime < lingerTime and activeEntity and activeEntity.model == model do
@@ -363,13 +362,13 @@ function EntityService:_runBehavior(entityType: string, model: Model, roomData: 
 				if targetPos and model.PrimaryPart then
 					local dir = (targetPos - model.PrimaryPart.Position)
 					if dir.Magnitude > 2 then
-						model.PrimaryPart.Position = model.PrimaryPart.Position + dir.Unit * ThresholdConfig.EntitySpeeds.Crawler * doorScaling * (1 / 30)
+						model.PrimaryPart.Position = model.PrimaryPart.Position
+							+ dir.Unit * ThresholdConfig.EntitySpeeds.Crawler * doorScaling * (1 / 30)
 					end
 				end
 			end
 			task.wait(1 / 30)
 		end
-
 	elseif entityType == "Mimic" then
 		-- Sits still. Damages on interaction. Just wait for linger time.
 		-- Interaction damage is handled via interact system detecting Mimic
@@ -385,7 +384,6 @@ function EntityService:_runBehavior(entityType: string, model: Model, roomData: 
 		trove:Add(interactType)
 
 		task.wait(lingerTime)
-
 	elseif entityType == "Whisper" then
 		-- Follows closest player. Damages if too close and player is still.
 		while tick() - startTime < lingerTime and activeEntity and activeEntity.model == model do
@@ -407,7 +405,8 @@ function EntityService:_runBehavior(entityType: string, model: Model, roomData: 
 				if targetPos and model.PrimaryPart then
 					if isPlayerMoving(closest) then
 						-- Reset distance — move away
-						model.PrimaryPart.Position = targetPos + Vector3.new(rng:NextNumber() * 20 - 10, 0, rng:NextNumber() * 20 - 10)
+						model.PrimaryPart.Position = targetPos
+							+ Vector3.new(rng:NextNumber() * 20 - 10, 0, rng:NextNumber() * 20 - 10)
 					else
 						-- Approach
 						local dir = (targetPos - model.PrimaryPart.Position)
@@ -423,12 +422,10 @@ function EntityService:_runBehavior(entityType: string, model: Model, roomData: 
 			end
 			task.wait(1 / 30)
 		end
-
 	elseif entityType == "Watcher" then
 		-- Client-side handles look detection and tells server
 		-- For now, just linger and despawn
 		task.wait(ThresholdConfig.WatcherDespawnTime)
-
 	elseif entityType == "Glitch" then
 		-- Teleports around, charges at random player
 		local chargeTarget: Player? = nil
@@ -465,7 +462,8 @@ function EntityService:_runBehavior(entityType: string, model: Model, roomData: 
 							PlayerService:DamagePlayer(chargeTarget, ThresholdConfig.EntityDamageHeavy)
 							charging = false
 						else
-							model.PrimaryPart.Position = model.PrimaryPart.Position + dir.Unit * ThresholdConfig.EntitySpeeds.Glitch * doorScaling * (1 / 30)
+							model.PrimaryPart.Position = model.PrimaryPart.Position
+								+ dir.Unit * ThresholdConfig.EntitySpeeds.Glitch * doorScaling * (1 / 30)
 						end
 					end
 				end
@@ -475,7 +473,6 @@ function EntityService:_runBehavior(entityType: string, model: Model, roomData: 
 			end
 			task.wait(1 / 30)
 		end
-
 	elseif entityType == "Devourer" then
 		-- Floor opens, tendrils grab. Must jump / stay on furniture.
 		-- Damage players touching floor near entity
@@ -484,7 +481,11 @@ function EntityService:_runBehavior(entityType: string, model: Model, roomData: 
 			for _, player in players do
 				local pos = getPlayerPosition(player)
 				if pos and model.PrimaryPart then
-					local dist = (Vector3.new(pos.X, 0, pos.Z) - Vector3.new(model.PrimaryPart.Position.X, 0, model.PrimaryPart.Position.Z)).Magnitude
+					local dist = (Vector3.new(pos.X, 0, pos.Z) - Vector3.new(
+						model.PrimaryPart.Position.X,
+						0,
+						model.PrimaryPart.Position.Z
+					)).Magnitude
 					if dist < 6 and pos.Y < roomData.Origin.Y + 2 then
 						-- Player is on the floor near the devourer
 						PlayerService:DamagePlayer(player, ThresholdConfig.EntityDamageLight)

@@ -3,8 +3,7 @@ local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
 local Knit = require(ReplicatedStorage.Packages.Knit)
-local Signal = require(ReplicatedStorage.Packages.Signal)
-local Promise = require(ReplicatedStorage.Packages.Promise)
+-- Packages used by Knit pattern
 
 local ThresholdConfig = require(ReplicatedStorage.Shared.ThresholdConfig)
 
@@ -29,6 +28,8 @@ type GameState = "Lobby" | "Playing" | "Transitioning" | "GameOver"
 local gameState: GameState = "Lobby"
 local currentDoor: number = 0
 local gameActive: boolean = false
+
+local _rng = Random.new()
 
 local function setGameState(newState: GameState)
 	gameState = newState
@@ -119,7 +120,7 @@ function GameService:AdvanceToNextRoom(): ()
 	-- Handle room-type-specific logic
 	if roomData.RoomType == "Entity" and roomData.EntityType then
 		-- Delay entity spawn slightly
-		task.delay(rng(), function()
+		task.delay(_rng:NextNumber() * 3 + 2, function()
 			if gameState == "Playing" and currentDoor == roomData.DoorNumber then
 				EntityService:SpawnEntity(roomData.EntityType, roomData)
 			end
@@ -131,7 +132,8 @@ function GameService:AdvanceToNextRoom(): ()
 	-- Start exit door check loop
 	task.spawn(function()
 		while gameActive and gameState == "Playing" and currentDoor == roomData.DoorNumber do
-			local exitDoor = RoomService:GetCurrentRoom() and RoomService:GetCurrentRoom():FindFirstChild("ExitDoor") :: Part?
+			local exitDoor = RoomService:GetCurrentRoom()
+				and RoomService:GetCurrentRoom():FindFirstChild("ExitDoor") :: Part?
 			if exitDoor then
 				local locked = exitDoor:FindFirstChild("Locked") :: BoolValue?
 				local isLocked = locked and locked.Value == true
@@ -143,11 +145,6 @@ function GameService:AdvanceToNextRoom(): ()
 			task.wait(0.5)
 		end
 	end)
-end
-
-local _rng = Random.new()
-local function rng(): number
-	return _rng:NextNumber() * 3 + 2 -- 2-5 second delay for entities
 end
 
 function GameService:OnPlayerDied(player: Player): ()

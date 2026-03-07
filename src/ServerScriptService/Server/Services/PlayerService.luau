@@ -201,9 +201,9 @@ function PlayerService.Client:Interact(player: Player, targetPath: string): ()
 		state.HasKey = true
 		self.Server.Client.KeyPickedUp:Fire(player)
 		target:Destroy()
-	elseif interactType.Value == "Search" then
-		-- Cabinet search — just an interaction confirmation
-		-- Could hide a key here in future
+	elseif interactType.Value == "Mimic" then
+		-- Mimic entity damages on interaction
+		self.Server:DamagePlayer(player, ThresholdConfig.EntityDamageHeavy)
 	end
 end
 
@@ -261,7 +261,11 @@ function PlayerService:_startUpdateLoop(): ()
 					end
 					self.Client.BatteryChanged:Fire(player, state.Battery)
 				elseif not state.FlashlightOn and state.Battery < 1 then
-					state.Battery = math.min(1, state.Battery + TICK * ThresholdConfig.FlashlightRechargeRate / ThresholdConfig.FlashlightBattery)
+					state.Battery = math.min(
+						1,
+						state.Battery
+							+ TICK * ThresholdConfig.FlashlightRechargeRate / ThresholdConfig.FlashlightBattery
+					)
 					self.Client.BatteryChanged:Fire(player, state.Battery)
 				end
 			end

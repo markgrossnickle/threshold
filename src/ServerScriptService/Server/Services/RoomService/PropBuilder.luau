@@ -3,7 +3,14 @@ local ThresholdConfig = require(game:GetService("ReplicatedStorage").Shared.Thre
 
 local PropBuilder = {}
 
-local function createPart(parent: Instance, name: string, size: Vector3, position: Vector3, color: Color3, material: Enum.Material?): Part
+local function createPart(
+	parent: Instance,
+	name: string,
+	size: Vector3,
+	position: Vector3,
+	color: Color3,
+	material: Enum.Material?
+): Part
 	local part = Instance.new("Part")
 	part.Anchored = true
 	part.Name = name
@@ -21,9 +28,18 @@ local function buildTable(parent: Instance, position: Vector3): Model
 	local model = Instance.new("Model")
 	model.Name = "Table"
 
-	local top = createPart(model, "Top", Vector3.new(4, 0.3, 2.5), position + Vector3.new(0, 3, 0), Color3.fromRGB(90, 60, 30), Enum.Material.Wood)
+	local top = createPart(
+		model,
+		"Top",
+		Vector3.new(4, 0.3, 2.5),
+		position + Vector3.new(0, 3, 0),
+		Color3.fromRGB(90, 60, 30),
+		Enum.Material.Wood
+	)
 	-- 4 legs
-	for _, offset in { Vector3.new(-1.7, 1.5, -1), Vector3.new(1.7, 1.5, -1), Vector3.new(-1.7, 1.5, 1), Vector3.new(1.7, 1.5, 1) } do
+	for _, offset in
+		{ Vector3.new(-1.7, 1.5, -1), Vector3.new(1.7, 1.5, -1), Vector3.new(-1.7, 1.5, 1), Vector3.new(1.7, 1.5, 1) }
+	do
 		local leg = Instance.new("Part")
 		leg.Anchored = true
 		leg.Name = "Leg"
@@ -44,10 +60,33 @@ local function buildChair(parent: Instance, position: Vector3): Model
 	local model = Instance.new("Model")
 	model.Name = "Chair"
 
-	local seat = createPart(model, "Seat", Vector3.new(2, 0.2, 2), position + Vector3.new(0, 2, 0), Color3.fromRGB(80, 55, 25), Enum.Material.Wood)
-	createPart(model, "Back", Vector3.new(2, 2, 0.2), position + Vector3.new(0, 3, -1), Color3.fromRGB(80, 55, 25), Enum.Material.Wood)
-	for _, offset in { Vector3.new(-0.8, 1, -0.8), Vector3.new(0.8, 1, -0.8), Vector3.new(-0.8, 1, 0.8), Vector3.new(0.8, 1, 0.8) } do
-		createPart(model, "Leg", Vector3.new(0.2, 2, 0.2), position + offset, Color3.fromRGB(70, 45, 20), Enum.Material.Wood)
+	local seat = createPart(
+		model,
+		"Seat",
+		Vector3.new(2, 0.2, 2),
+		position + Vector3.new(0, 2, 0),
+		Color3.fromRGB(80, 55, 25),
+		Enum.Material.Wood
+	)
+	createPart(
+		model,
+		"Back",
+		Vector3.new(2, 2, 0.2),
+		position + Vector3.new(0, 3, -1),
+		Color3.fromRGB(80, 55, 25),
+		Enum.Material.Wood
+	)
+	for _, offset in
+		{ Vector3.new(-0.8, 1, -0.8), Vector3.new(0.8, 1, -0.8), Vector3.new(-0.8, 1, 0.8), Vector3.new(0.8, 1, 0.8) }
+	do
+		createPart(
+			model,
+			"Leg",
+			Vector3.new(0.2, 2, 0.2),
+			position + offset,
+			Color3.fromRGB(70, 45, 20),
+			Enum.Material.Wood
+		)
 	end
 
 	model.PrimaryPart = seat
@@ -59,9 +98,23 @@ local function buildCabinet(parent: Instance, position: Vector3): Model
 	local model = Instance.new("Model")
 	model.Name = "Cabinet"
 
-	local body = createPart(model, "Body", Vector3.new(3, 5, 2), position + Vector3.new(0, 2.5, 0), Color3.fromRGB(65, 50, 35), Enum.Material.Wood)
+	local body = createPart(
+		model,
+		"Body",
+		Vector3.new(3, 5, 2),
+		position + Vector3.new(0, 2.5, 0),
+		Color3.fromRGB(65, 50, 35),
+		Enum.Material.Wood
+	)
 
-	local door = createPart(model, "Door", Vector3.new(2.8, 4.8, 0.2), position + Vector3.new(0, 2.5, 1.1), Color3.fromRGB(75, 55, 38), Enum.Material.Wood)
+	local door = createPart(
+		model,
+		"Door",
+		Vector3.new(2.8, 4.8, 0.2),
+		position + Vector3.new(0, 2.5, 1.1),
+		Color3.fromRGB(75, 55, 38),
+		Enum.Material.Wood
+	)
 
 	-- Make searchable
 	local interactable = Instance.new("BoolValue")
@@ -84,7 +137,14 @@ local function buildCabinet(parent: Instance, position: Vector3): Model
 end
 
 local function buildShelf(parent: Instance, position: Vector3): Part
-	local shelf = createPart(parent, "Shelf", Vector3.new(4, 0.3, 1.5), position + Vector3.new(0, 4, 0), Color3.fromRGB(85, 60, 35), Enum.Material.Wood)
+	local shelf = createPart(
+		parent,
+		"Shelf",
+		Vector3.new(4, 0.3, 1.5),
+		position + Vector3.new(0, 4, 0),
+		Color3.fromRGB(85, 60, 35),
+		Enum.Material.Wood
+	)
 	return shelf
 end
 
@@ -92,12 +152,40 @@ local function buildDesk(parent: Instance, position: Vector3): Model
 	local model = Instance.new("Model")
 	model.Name = "Desk"
 
-	local top = createPart(model, "Top", Vector3.new(5, 0.3, 3), position + Vector3.new(0, 3, 0), Color3.fromRGB(95, 65, 35), Enum.Material.Wood)
+	local top = createPart(
+		model,
+		"Top",
+		Vector3.new(5, 0.3, 3),
+		position + Vector3.new(0, 3, 0),
+		Color3.fromRGB(95, 65, 35),
+		Enum.Material.Wood
+	)
 	-- Side panel
-	createPart(model, "SidePanel", Vector3.new(0.3, 3, 3), position + Vector3.new(-2.35, 1.5, 0), Color3.fromRGB(85, 58, 30), Enum.Material.Wood)
+	createPart(
+		model,
+		"SidePanel",
+		Vector3.new(0.3, 3, 3),
+		position + Vector3.new(-2.35, 1.5, 0),
+		Color3.fromRGB(85, 58, 30),
+		Enum.Material.Wood
+	)
 	-- Legs on open side
-	createPart(model, "Leg1", Vector3.new(0.3, 3, 0.3), position + Vector3.new(2.35, 1.5, -1.3), Color3.fromRGB(85, 58, 30), Enum.Material.Wood)
-	createPart(model, "Leg2", Vector3.new(0.3, 3, 0.3), position + Vector3.new(2.35, 1.5, 1.3), Color3.fromRGB(85, 58, 30), Enum.Material.Wood)
+	createPart(
+		model,
+		"Leg1",
+		Vector3.new(0.3, 3, 0.3),
+		position + Vector3.new(2.35, 1.5, -1.3),
+		Color3.fromRGB(85, 58, 30),
+		Enum.Material.Wood
+	)
+	createPart(
+		model,
+		"Leg2",
+		Vector3.new(0.3, 3, 0.3),
+		position + Vector3.new(2.35, 1.5, 1.3),
+		Color3.fromRGB(85, 58, 30),
+		Enum.Material.Wood
+	)
 
 	model.PrimaryPart = top
 	model.Parent = parent
@@ -109,11 +197,32 @@ local function buildBed(parent: Instance, position: Vector3): Model
 	model.Name = "Bed"
 
 	-- Frame
-	createPart(model, "Frame", Vector3.new(4, 1, 6), position + Vector3.new(0, 0.5, 0), Color3.fromRGB(70, 50, 30), Enum.Material.Wood)
+	createPart(
+		model,
+		"Frame",
+		Vector3.new(4, 1, 6),
+		position + Vector3.new(0, 0.5, 0),
+		Color3.fromRGB(70, 50, 30),
+		Enum.Material.Wood
+	)
 	-- Mattress
-	local mattress = createPart(model, "Mattress", Vector3.new(3.6, 0.6, 5.6), position + Vector3.new(0, 1.3, 0), Color3.fromRGB(180, 170, 160), Enum.Material.Fabric)
+	local mattress = createPart(
+		model,
+		"Mattress",
+		Vector3.new(3.6, 0.6, 5.6),
+		position + Vector3.new(0, 1.3, 0),
+		Color3.fromRGB(180, 170, 160),
+		Enum.Material.Fabric
+	)
 	-- Headboard
-	createPart(model, "Headboard", Vector3.new(4, 3, 0.3), position + Vector3.new(0, 1.5, -3), Color3.fromRGB(65, 45, 25), Enum.Material.Wood)
+	createPart(
+		model,
+		"Headboard",
+		Vector3.new(4, 3, 0.3),
+		position + Vector3.new(0, 1.5, -3),
+		Color3.fromRGB(65, 45, 25),
+		Enum.Material.Wood
+	)
 
 	-- Hideable
 	local hideable = Instance.new("BoolValue")
@@ -127,7 +236,14 @@ end
 
 local function buildCrate(parent: Instance, position: Vector3, rng: Random): Part
 	local size = rng:NextNumber() * 2 + 1.5
-	local crate = createPart(parent, "Crate", Vector3.new(size, size, size), position + Vector3.new(0, size / 2, 0), Color3.fromRGB(110, 85, 55), Enum.Material.Wood)
+	local crate = createPart(
+		parent,
+		"Crate",
+		Vector3.new(size, size, size),
+		position + Vector3.new(0, size / 2, 0),
+		Color3.fromRGB(110, 85, 55),
+		Enum.Material.Wood
+	)
 	return crate
 end
 
@@ -146,14 +262,57 @@ end
 
 type PropPlacer = (parent: Instance, position: Vector3, rng: Random) -> ()
 
-local propBuilders: { { name: string, sizeX: number, sizeZ: number, build: (parent: Instance, position: Vector3, rng: Random) -> () } } = {
-	{ name = "Table", sizeX = 4, sizeZ = 2.5, build = function(p, pos, _) buildTable(p, pos) end },
-	{ name = "Chair", sizeX = 2, sizeZ = 2, build = function(p, pos, _) buildChair(p, pos) end },
-	{ name = "Cabinet", sizeX = 3, sizeZ = 2, build = function(p, pos, _) buildCabinet(p, pos) end },
-	{ name = "Desk", sizeX = 5, sizeZ = 3, build = function(p, pos, _) buildDesk(p, pos) end },
-	{ name = "Bed", sizeX = 4, sizeZ = 6, build = function(p, pos, _) buildBed(p, pos) end },
-	{ name = "Crate", sizeX = 3, sizeZ = 3, build = function(p, pos, r) buildCrate(p, pos, r) end },
-}
+local propBuilders: { { name: string, sizeX: number, sizeZ: number, build: (parent: Instance, position: Vector3, rng: Random) -> () } } =
+	{
+		{
+			name = "Table",
+			sizeX = 4,
+			sizeZ = 2.5,
+			build = function(p, pos, _)
+				buildTable(p, pos)
+			end,
+		},
+		{
+			name = "Chair",
+			sizeX = 2,
+			sizeZ = 2,
+			build = function(p, pos, _)
+				buildChair(p, pos)
+			end,
+		},
+		{
+			name = "Cabinet",
+			sizeX = 3,
+			sizeZ = 2,
+			build = function(p, pos, _)
+				buildCabinet(p, pos)
+			end,
+		},
+		{
+			name = "Desk",
+			sizeX = 5,
+			sizeZ = 3,
+			build = function(p, pos, _)
+				buildDesk(p, pos)
+			end,
+		},
+		{
+			name = "Bed",
+			sizeX = 4,
+			sizeZ = 6,
+			build = function(p, pos, _)
+				buildBed(p, pos)
+			end,
+		},
+		{
+			name = "Crate",
+			sizeX = 3,
+			sizeZ = 3,
+			build = function(p, pos, r)
+				buildCrate(p, pos, r)
+			end,
+		},
+	}
 
 function PropBuilder.populateRoom(folder: Folder, sizeX: number, sizeZ: number, origin: Vector3, rng: Random): ()
 	local propCount = rng:NextInteger(ThresholdConfig.MinProps, ThresholdConfig.MaxProps)
@@ -190,8 +349,10 @@ function PropBuilder.populateRoom(folder: Folder, sizeX: number, sizeZ: number, 
 			-- Collision check
 			local overlaps = false
 			for _, existing in placed do
-				if math.abs(px - existing.x) < (builder.sizeX + existing.sx) / 2 + padding
-					and math.abs(pz - existing.z) < (builder.sizeZ + existing.sz) / 2 + padding then
+				if
+					math.abs(px - existing.x) < (builder.sizeX + existing.sx) / 2 + padding
+					and math.abs(pz - existing.z) < (builder.sizeZ + existing.sz) / 2 + padding
+				then
 					overlaps = true
 					break
 				end

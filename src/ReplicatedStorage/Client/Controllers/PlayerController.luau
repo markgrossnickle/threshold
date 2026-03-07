@@ -1,11 +1,9 @@
 --!strict
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
-local UserInputService = game:GetService("UserInputService")
 local ContextActionService = game:GetService("ContextActionService")
 
 local Knit = require(ReplicatedStorage.Packages.Knit)
-local Trove = require(ReplicatedStorage.Packages.Trove)
 
 local ThresholdConfig = require(ReplicatedStorage.Shared.ThresholdConfig)
 local PlatformUtil = require(ReplicatedStorage.Shared.PlatformUtil)
@@ -20,10 +18,8 @@ local PlayerController = Knit.CreateController({
 local PlayerService
 local flashlightPart: Part? = nil
 local spotLight: SpotLight? = nil
-local trove = Trove.new()
 
 -- UI references
-local hpBar: Frame? = nil
 local hpFill: Frame? = nil
 local staminaBar: Frame? = nil
 local staminaFill: Frame? = nil
@@ -32,6 +28,56 @@ local batteryFill: Frame? = nil
 local interactPrompt: TextLabel? = nil
 local doorCounter: TextLabel? = nil
 local damageOverlay: ImageLabel? = nil
+
+local function createMobileButtons(gui: ScreenGui): ()
+	local btnSize = ThresholdConfig.MobileButtonSize
+	local padding = 10
+
+	local function makeButton(name: string, text: string, posX: number, posY: number): TextButton
+		local btn = Instance.new("TextButton")
+		btn.Name = name
+		btn.Size = UDim2.new(0, btnSize, 0, btnSize)
+		btn.Position = UDim2.new(1, posX, 1, posY)
+		btn.BackgroundColor3 = Color3.fromRGB(60, 60, 60)
+		btn.BackgroundTransparency = 0.4
+		btn.TextColor3 = Color3.fromRGB(255, 255, 255)
+		btn.Text = text
+		btn.TextScaled = true
+		btn.Font = Enum.Font.GothamBold
+		btn.Parent = gui
+
+		local corner = Instance.new("UICorner")
+		corner.CornerRadius = UDim.new(0, 8)
+		corner.Parent = btn
+		return btn
+	end
+
+	local flashlightBtn = makeButton("FlashlightBtn", "F", -(btnSize + padding), -(btnSize * 3 + padding * 3))
+	local sprintBtn = makeButton("SprintBtn", "RUN", -(btnSize + padding), -(btnSize * 2 + padding * 2))
+	local crouchBtn = makeButton("CrouchBtn", "C", -(btnSize + padding), -(btnSize + padding))
+	local interactBtn = makeButton("InteractBtn", "E", -(btnSize * 2 + padding * 2), -(btnSize * 2 + padding * 2))
+
+	flashlightBtn.Activated:Connect(function()
+		PlayerService:ToggleFlashlight()
+	end)
+
+	sprintBtn.Activated:Connect(function()
+		PlayerService:SetSprinting(true)
+		task.delay(0.5, function()
+			PlayerService:SetSprinting(false)
+		end)
+	end)
+
+	local crouching = false
+	crouchBtn.Activated:Connect(function()
+		crouching = not crouching
+		PlayerService:SetCrouching(crouching)
+	end)
+
+	interactBtn.Activated:Connect(function()
+		PlayerController:TryInteract()
+	end)
+end
 
 local function createHUD(): ()
 	local gui = Instance.new("ScreenGui")
@@ -49,7 +95,6 @@ local function createHUD(): ()
 	hpContainer.BackgroundColor3 = Color3.fromRGB(40, 10, 10)
 	hpContainer.BorderSizePixel = 0
 	hpContainer.Parent = gui
-	hpBar = hpContainer
 
 	local corner = Instance.new("UICorner")
 	corner.CornerRadius = UDim.new(0, 4)
@@ -167,57 +212,6 @@ local function createHUD(): ()
 	end
 end
 
-local function createMobileButtons(gui: ScreenGui): ()
-	local btnSize = ThresholdConfig.MobileButtonSize
-	local padding = 10
-
-	local function makeButton(name: string, text: string, posX: number, posY: number): TextButton
-		local btn = Instance.new("TextButton")
-		btn.Name = name
-		btn.Size = UDim2.new(0, btnSize, 0, btnSize)
-		btn.Position = UDim2.new(1, posX, 1, posY)
-		btn.BackgroundColor3 = Color3.fromRGB(60, 60, 60)
-		btn.BackgroundTransparency = 0.4
-		btn.TextColor3 = Color3.fromRGB(255, 255, 255)
-		btn.Text = text
-		btn.TextScaled = true
-		btn.Font = Enum.Font.GothamBold
-		btn.Parent = gui
-
-		local corner = Instance.new("UICorner")
-		corner.CornerRadius = UDim.new(0, 8)
-		corner.Parent = btn
-		return btn
-	end
-
-	-- Right side buttons
-	local flashlightBtn = makeButton("FlashlightBtn", "F", -(btnSize + padding), -(btnSize * 3 + padding * 3))
-	local sprintBtn = makeButton("SprintBtn", "RUN", -(btnSize + padding), -(btnSize * 2 + padding * 2))
-	local crouchBtn = makeButton("CrouchBtn", "C", -(btnSize + padding), -(btnSize + padding))
-	local interactBtn = makeButton("InteractBtn", "E", -(btnSize * 2 + padding * 2), -(btnSize * 2 + padding * 2))
-
-	flashlightBtn.Activated:Connect(function()
-		PlayerService:ToggleFlashlight()
-	end)
-
-	sprintBtn.TouchLongPress:Connect(function()
-		PlayerService:SetSprinting(true)
-	end)
-	sprintBtn.InputEnded:Connect(function()
-		PlayerService:SetSprinting(false)
-	end)
-
-	local crouching = false
-	crouchBtn.Activated:Connect(function()
-		crouching = not crouching
-		PlayerService:SetCrouching(crouching)
-	end)
-
-	interactBtn.Activated:Connect(function()
-		PlayerController:TryInteract()
-	end)
-end
-
 local function createFlashlight(): ()
 	local character = Player.Character
 	if not character then
@@ -228,7 +222,6 @@ local function createFlashlight(): ()
 		return
 	end
 
-	-- Clean up old flashlight
 	if flashlightPart then
 		flashlightPart:Destroy()
 	end
@@ -272,7 +265,6 @@ function PlayerController:TryInteract(): ()
 		return
 	end
 
-	-- Raycast or find nearby interactable
 	local closestDist = 8
 	local closestTarget: Instance? = nil
 
@@ -289,24 +281,19 @@ function PlayerController:TryInteract(): ()
 	if closestTarget then
 		local interactType = closestTarget:FindFirstChild("InteractType") :: StringValue?
 		if interactType then
-			if interactType.Value == "Key" then
-				PlayerService:Interact(closestTarget:GetFullName())
-			elseif interactType.Value == "Lever" then
+			local val = interactType.Value
+			if val == "Lever" then
 				local index = closestTarget:FindFirstChild("LeverIndex") :: IntValue?
 				if index then
 					local PuzzleService = Knit.GetService("PuzzleService")
 					PuzzleService:SubmitInput(index.Value)
 				end
-			elseif interactType.Value == "FuelCanister" then
+			elseif val == "FuelCanister" then
 				local PuzzleService = Knit.GetService("PuzzleService")
 				PuzzleService:SubmitFuelCanister()
 				closestTarget:Destroy()
-			elseif interactType.Value == "Generator" then
-				-- Generator interaction handled by placing fuel
-			elseif interactType.Value == "Search" then
-				PlayerService:Interact(closestTarget:GetFullName())
-			elseif interactType.Value == "Mimic" then
-				-- Interacting with a Mimic = damage
+			else
+				-- Key, Search, Mimic — all handled server-side
 				PlayerService:Interact(closestTarget:GetFullName())
 			end
 		end
@@ -321,7 +308,6 @@ function PlayerController:KnitStart(): ()
 	PlayerService = Knit.GetService("PlayerService")
 	local GameService = Knit.GetService("GameService")
 
-	-- Flashlight on character spawn
 	Player.CharacterAdded:Connect(function()
 		task.wait(0.5)
 		createFlashlight()
@@ -330,12 +316,10 @@ function PlayerController:KnitStart(): ()
 		createFlashlight()
 	end
 
-	-- HP updates
 	PlayerService.HPChanged:Connect(function(hp: number)
 		if hpFill then
 			hpFill.Size = UDim2.fromScale(hp / ThresholdConfig.MaxHP, 1)
 		end
-		-- Damage flash
 		if damageOverlay and hp < ThresholdConfig.MaxHP then
 			damageOverlay.BackgroundTransparency = 0.5
 			task.delay(0.3, function()
@@ -346,7 +330,6 @@ function PlayerController:KnitStart(): ()
 		end
 	end)
 
-	-- Stamina updates
 	PlayerService.StaminaChanged:Connect(function(stamina: number)
 		if staminaFill then
 			staminaFill.Size = UDim2.fromScale(stamina, 1)
@@ -356,14 +339,12 @@ function PlayerController:KnitStart(): ()
 		end
 	end)
 
-	-- Battery updates
 	PlayerService.BatteryChanged:Connect(function(battery: number)
 		if batteryFill then
 			batteryFill.Size = UDim2.fromScale(battery, 1)
 		end
 	end)
 
-	-- Flashlight toggle
 	PlayerService.FlashlightToggled:Connect(function(isOn: boolean)
 		if spotLight then
 			spotLight.Enabled = isOn
@@ -373,14 +354,12 @@ function PlayerController:KnitStart(): ()
 		end
 	end)
 
-	-- Door counter
 	GameService.DoorNumberChanged:Connect(function(doorNumber: number)
 		if doorCounter then
 			doorCounter.Text = "Door " .. doorNumber .. "/" .. ThresholdConfig.MaxDoors
 		end
 	end)
 
-	-- Key pickup
 	PlayerService.KeyPickedUp:Connect(function()
 		if interactPrompt then
 			interactPrompt.Text = "KEY FOUND - Go to exit door"
@@ -393,20 +372,17 @@ function PlayerController:KnitStart(): ()
 		end
 	end)
 
-	-- Input bindings
 	self:_bindInputs()
 	self:_startInteractCheck()
 end
 
 function PlayerController:_bindInputs(): ()
-	-- Flashlight: F key
 	ContextActionService:BindAction("ToggleFlashlight", function(_, state)
 		if state == Enum.UserInputState.Begin then
 			PlayerService:ToggleFlashlight()
 		end
 	end, false, Enum.KeyCode.F)
 
-	-- Sprint: Left Shift (hold)
 	ContextActionService:BindAction("Sprint", function(_, state)
 		if state == Enum.UserInputState.Begin then
 			PlayerService:SetSprinting(true)
@@ -415,7 +391,6 @@ function PlayerController:_bindInputs(): ()
 		end
 	end, false, Enum.KeyCode.LeftShift)
 
-	-- Crouch: C or Left Control
 	local crouching = false
 	ContextActionService:BindAction("Crouch", function(_, state)
 		if state == Enum.UserInputState.Begin then
@@ -424,21 +399,18 @@ function PlayerController:_bindInputs(): ()
 		end
 	end, false, Enum.KeyCode.C, Enum.KeyCode.LeftControl)
 
-	-- Interact: E
 	ContextActionService:BindAction("Interact", function(_, state)
 		if state == Enum.UserInputState.Begin then
 			self:TryInteract()
 		end
 	end, false, Enum.KeyCode.E)
 
-	-- Use key at exit door: also E when near door with key
 	ContextActionService:BindAction("UseKey", function(_, state)
 		if state == Enum.UserInputState.Begin then
 			PlayerService:UseKey()
 		end
 	end, false, Enum.KeyCode.Q)
 
-	-- Gamepad bindings
 	if PlatformUtil.isGamepad() then
 		ContextActionService:BindAction("GP_Flashlight", function(_, state)
 			if state == Enum.UserInputState.Begin then
@@ -496,17 +468,14 @@ function PlayerController:_startInteractCheck(): ()
 				interactPrompt.Visible = nearInteractable
 			end
 
-			-- Also check if near exit door with key
+			-- Check if near exit door with key
 			local exitDoor = workspace:FindFirstChild("ExitDoor", true) :: BasePart?
 			if exitDoor then
 				local locked = exitDoor:FindFirstChild("Locked") :: BoolValue?
 				if locked and locked.Value and (exitDoor.Position - root.Position).Magnitude < 8 then
 					if interactPrompt then
-						local state = PlayerService:GetPlayerState():await()
-						if state and state.HasKey then
-							interactPrompt.Text = "[Q] Use Key"
-							interactPrompt.Visible = true
-						end
+						interactPrompt.Text = "[Q] Use Key"
+						interactPrompt.Visible = true
 					end
 				end
 			end

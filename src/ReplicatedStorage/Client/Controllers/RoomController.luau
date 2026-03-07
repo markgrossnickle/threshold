@@ -4,7 +4,6 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local TweenService = game:GetService("TweenService")
 
 local Knit = require(ReplicatedStorage.Packages.Knit)
-local Trove = require(ReplicatedStorage.Packages.Trove)
 
 local ThresholdConfig = require(ReplicatedStorage.Shared.ThresholdConfig)
 
@@ -17,8 +16,6 @@ local RoomController = Knit.CreateController({
 
 local fadeFrame: Frame? = nil
 local doorLabel: TextLabel? = nil
-local screenGui: ScreenGui? = nil
-local trove = Trove.new()
 
 local function createUI(): ()
 	local gui = Instance.new("ScreenGui")
@@ -27,7 +24,6 @@ local function createUI(): ()
 	gui.IgnoreGuiInset = true
 	gui.DisplayOrder = 100
 	gui.Parent = PlayerGui
-	screenGui = gui
 
 	-- Fade overlay
 	local frame = Instance.new("Frame")
@@ -61,9 +57,10 @@ local function fadeToBlack(duration: number): ()
 		return
 	end
 	fadeFrame.BackgroundTransparency = 1
-	local tween = TweenService:Create(fadeFrame, TweenInfo.new(duration, Enum.EasingStyle.Quad, Enum.EasingDirection.In), {
-		BackgroundTransparency = 0,
-	})
+	local tween =
+		TweenService:Create(fadeFrame, TweenInfo.new(duration, Enum.EasingStyle.Quad, Enum.EasingDirection.In), {
+			BackgroundTransparency = 0,
+		})
 	tween:Play()
 	tween.Completed:Wait()
 end
@@ -73,9 +70,10 @@ local function fadeFromBlack(duration: number): ()
 		return
 	end
 	fadeFrame.BackgroundTransparency = 0
-	local tween = TweenService:Create(fadeFrame, TweenInfo.new(duration, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {
-		BackgroundTransparency = 1,
-	})
+	local tween =
+		TweenService:Create(fadeFrame, TweenInfo.new(duration, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {
+			BackgroundTransparency = 1,
+		})
 	tween:Play()
 	tween.Completed:Wait()
 end

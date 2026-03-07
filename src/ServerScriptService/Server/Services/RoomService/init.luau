@@ -5,8 +5,6 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Knit = require(ReplicatedStorage.Packages.Knit)
 local Signal = require(ReplicatedStorage.Packages.Signal)
 local Trove = require(ReplicatedStorage.Packages.Trove)
-local Promise = require(ReplicatedStorage.Packages.Promise)
-
 local ThresholdConfig = require(ReplicatedStorage.Shared.ThresholdConfig)
 
 local PropBuilder = require(script.PropBuilder)
@@ -60,7 +58,13 @@ local function pickRoomType(doorNumber: number): RoomType
 	return "Empty"
 end
 
-local function createPart(parent: Instance, size: Vector3, position: Vector3, color: Color3, material: Enum.Material): Part
+local function createPart(
+	parent: Instance,
+	size: Vector3,
+	position: Vector3,
+	color: Color3,
+	material: Enum.Material
+): Part
 	local part = Instance.new("Part")
 	part.Anchored = true
 	part.Size = size
@@ -108,7 +112,8 @@ local function createRoomShell(folder: Folder, sizeX: number, sizeZ: number, ori
 		origin + Vector3.new(-thick / 2, height / 2, sizeZ / 2),
 		wallColor,
 		wallMat
-	).Name = "WallLeft"
+	).Name =
+		"WallLeft"
 
 	-- Right wall (along Z axis at X=sizeX)
 	createPart(
@@ -117,7 +122,8 @@ local function createRoomShell(folder: Folder, sizeX: number, sizeZ: number, ori
 		origin + Vector3.new(sizeX + thick / 2, height / 2, sizeZ / 2),
 		wallColor,
 		wallMat
-	).Name = "WallRight"
+	).Name =
+		"WallRight"
 
 	-- Back wall (entry side, Z=0) — two pieces with door gap
 	local doorW = ThresholdConfig.DoorWidth
@@ -131,7 +137,8 @@ local function createRoomShell(folder: Folder, sizeX: number, sizeZ: number, ori
 		origin + Vector3.new(halfWall / 2, height / 2, -thick / 2),
 		wallColor,
 		wallMat
-	).Name = "BackWallLeft"
+	).Name =
+		"BackWallLeft"
 
 	-- Right piece of back wall
 	createPart(
@@ -140,7 +147,8 @@ local function createRoomShell(folder: Folder, sizeX: number, sizeZ: number, ori
 		origin + Vector3.new(sizeX - halfWall / 2, height / 2, -thick / 2),
 		wallColor,
 		wallMat
-	).Name = "BackWallRight"
+	).Name =
+		"BackWallRight"
 
 	-- Top piece above door
 	createPart(
@@ -149,7 +157,8 @@ local function createRoomShell(folder: Folder, sizeX: number, sizeZ: number, ori
 		origin + Vector3.new(sizeX / 2, doorH + (height - doorH) / 2, -thick / 2),
 		wallColor,
 		wallMat
-	).Name = "BackWallTop"
+	).Name =
+		"BackWallTop"
 
 	-- Entry door (initially open, locks after entering)
 	local entryDoor = createPart(
@@ -170,7 +179,8 @@ local function createRoomShell(folder: Folder, sizeX: number, sizeZ: number, ori
 		origin + Vector3.new(halfWall / 2, height / 2, sizeZ + thick / 2),
 		wallColor,
 		wallMat
-	).Name = "FrontWallLeft"
+	).Name =
+		"FrontWallLeft"
 
 	createPart(
 		folder,
@@ -178,7 +188,8 @@ local function createRoomShell(folder: Folder, sizeX: number, sizeZ: number, ori
 		origin + Vector3.new(sizeX - halfWall / 2, height / 2, sizeZ + thick / 2),
 		wallColor,
 		wallMat
-	).Name = "FrontWallRight"
+	).Name =
+		"FrontWallRight"
 
 	createPart(
 		folder,
@@ -186,7 +197,8 @@ local function createRoomShell(folder: Folder, sizeX: number, sizeZ: number, ori
 		origin + Vector3.new(sizeX / 2, doorH + (height - doorH) / 2, sizeZ + thick / 2),
 		wallColor,
 		wallMat
-	).Name = "FrontWallTop"
+	).Name =
+		"FrontWallTop"
 
 	-- Exit door
 	local exitDoor = createPart(
@@ -293,7 +305,8 @@ local function addCeilingHoles(folder: Folder, sizeX: number, sizeZ: number, ori
 		hole.Name = "CeilingHole"
 		hole.Anchored = true
 		hole.Size = Vector3.new(holeSize, ThresholdConfig.WallThickness + 0.2, holeSize)
-		hole.Position = origin + Vector3.new(holeX, ThresholdConfig.RoomHeight + ThresholdConfig.WallThickness / 2, holeZ)
+		hole.Position = origin
+			+ Vector3.new(holeX, ThresholdConfig.RoomHeight + ThresholdConfig.WallThickness / 2, holeZ)
 		hole.Color = Color3.fromRGB(5, 5, 5)
 		hole.Material = Enum.Material.SmoothPlastic
 		hole.Transparency = 0

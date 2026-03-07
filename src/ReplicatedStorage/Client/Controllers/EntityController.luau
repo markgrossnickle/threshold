@@ -59,7 +59,6 @@ end
 
 local function cameraShake(intensity: number, duration: number): ()
 	local startTime = tick()
-	local originalCFrame = Camera.CFrame
 	local connection: RBXScriptConnection
 	connection = RunService.RenderStepped:Connect(function()
 		local elapsed = tick() - startTime
@@ -68,11 +67,8 @@ local function cameraShake(intensity: number, duration: number): ()
 			return
 		end
 		local decay = 1 - (elapsed / duration)
-		local offset = Vector3.new(
-			(math.random() - 0.5) * intensity * decay,
-			(math.random() - 0.5) * intensity * decay,
-			0
-		)
+		local offset =
+			Vector3.new((math.random() - 0.5) * intensity * decay, (math.random() - 0.5) * intensity * decay, 0)
 		Camera.CFrame = Camera.CFrame * CFrame.new(offset)
 	end)
 end
@@ -104,7 +100,7 @@ function EntityController:KnitStart(): ()
 	local EntityService = Knit.GetService("EntityService")
 
 	-- Warning phase
-	EntityService.EntityWarning:Connect(function(entityType: string, duration: number)
+	EntityService.EntityWarning:Connect(function(_entityType: string, duration: number)
 		task.spawn(function()
 			-- Flicker lights effect via warning
 			pulseWarning(duration)
@@ -126,13 +122,13 @@ function EntityController:KnitStart(): ()
 	end)
 
 	-- Entity despawned
-	EntityService.EntityDespawned:Connect(function(entityType: string)
+	EntityService.EntityDespawned:Connect(function(_entityType: string)
 		entityTrove:Clean()
 		watcherActive = false
 	end)
 
 	-- Entity attack
-	EntityService.EntityAttack:Connect(function(entityType: string, targetPlayer: Player)
+	EntityService.EntityAttack:Connect(function(_entityType: string, targetPlayer: Player)
 		if targetPlayer == Player then
 			-- Jump scare!
 			flashScreen(Color3.fromRGB(200, 0, 0), 0.3)

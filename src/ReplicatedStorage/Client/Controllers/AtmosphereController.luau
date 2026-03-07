@@ -21,9 +21,7 @@ local AtmosphereController = Knit.CreateController({
 local roomTrove = Trove.new()
 
 -- Sound references
-local ambientDrone: Sound? = nil
 local heartbeat: Sound? = nil
-local footstepConnection: RBXScriptConnection? = nil
 
 local function setupLighting(): ()
 	Lighting.Ambient = ThresholdConfig.AmbientLight
@@ -70,7 +68,6 @@ local function setupSounds(): ()
 	drone.Looped = true
 	drone.Volume = 0.3
 	drone.Parent = SoundService
-	ambientDrone = drone
 
 	-- Heartbeat
 	local hb = Instance.new("Sound")

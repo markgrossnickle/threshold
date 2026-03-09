@@ -29,7 +29,7 @@ local function setupLighting(): ()
 	Lighting.Brightness = 0
 	Lighting.ClockTime = 0
 	Lighting.GlobalShadows = true
-	Lighting.Technology = Enum.Technology.Future
+	-- Lighting.Technology must be set in Studio (not scriptable at runtime)
 
 	-- Fog
 	local atmosphere = Lighting:FindFirstChildOfClass("Atmosphere")

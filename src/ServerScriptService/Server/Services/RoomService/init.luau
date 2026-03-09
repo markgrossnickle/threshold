@@ -475,7 +475,15 @@ function RoomService:ClearRoom(): ()
 end
 
 function RoomService:KnitInit(): ()
-	-- Pre-create workspace folder for rooms
+	-- Remove default Baseplate/SpawnLocation to prevent Z-fighting with room floors
+	local baseplate = workspace:FindFirstChild("Baseplate")
+	if baseplate then
+		baseplate:Destroy()
+	end
+	local spawnLocation = workspace:FindFirstChild("SpawnLocation")
+	if spawnLocation then
+		spawnLocation:Destroy()
+	end
 end
 
 function RoomService:KnitStart(): ()

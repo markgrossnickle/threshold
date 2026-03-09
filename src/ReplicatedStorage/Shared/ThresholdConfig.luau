@@ -64,11 +64,11 @@ ThresholdConfig.EntityUnlockDoors = {
 	Devourer = 50,
 }
 
--- Entity speeds
+-- Entity speeds (base values, scaled up by door number via DifficultyScaling)
 ThresholdConfig.EntitySpeeds = {
-	Shadow = 40,
-	Crawler = 20,
-	Glitch = 35,
+	Shadow = 20,
+	Crawler = 12,
+	Glitch = 22,
 }
 
 -- Entity timings
